@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduccion a JS</title>
+</head>
+<body>
+    <h1>Bienvenidos a Programacion Computacional IV</h1>
+    <h3>Hola Chicos de Progra IV...</h3>
+    <label for="txtnombre">Nombre: </label>
+    <input type="text" name="txtnombre" id="txtnombre" 
+        placeholder="nombre...">
+    <span id="spnSaludo"></span>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', e=>{
+            txtnombre.addEventListener('keyup', e=>{
+                let nombre = txtnombre.value;
+                spnSaludo.innerHTML = `Hola ${nombre}`;
+            });
+        });
+    </script>
+</body>
+</html>
