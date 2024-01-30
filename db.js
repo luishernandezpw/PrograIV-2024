@@ -15,6 +15,6 @@ const funcdb = ()=>{
     };
 }, abrirStore = (store, modo)=>{
     let ltx = db.transaction(store, modo);
-    return ltx.objectStorage(store);
+    return ltx.objectStore(store);
 };
 funcdb();
