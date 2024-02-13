@@ -1,16 +1,23 @@
+Vue.component('v-select-categoria', VueSelect.VueSelect);
 Vue.component('componente-productos', {
     data() {
         return {
             valor:'',
             productos:[],
+            categorias:[],
             accion:'nuevo',
             producto:{
+                categoria:{
+                    id:'',
+                    label:''
+                },
                 idProducto: new Date().getTime(),
                 codigo:'',
                 nombre:'',
                 marca:'',
                 presentacion:'',
-                precio:0.0
+                precio:0.0,
+                foto:'',
             }
         }
     },
@@ -34,6 +41,11 @@ Vue.component('componente-productos', {
         },
         guardarProducto(){
             //almacenamiento del objeto productos en indexedDB
+            if( this.producto.categoria.id=='' ||
+                this.producto.categoria.label=='' ){
+                console.error("Por favor seleccione una categoria");
+                return;
+            }
             let store = abrirStore('productos', 'readwrite'),
                 query = store.put({...this.producto});
             query.onsuccess = e=>{
@@ -47,6 +59,10 @@ Vue.component('componente-productos', {
         nuevoProducto(){
             this.accion = 'nuevo';
             this.producto = {
+                categoria:{
+                    id:'',
+                    label:''
+                },
                 idProducto: new Date().getTime(),
                 codigo:'',
                 nombre:'',
@@ -56,6 +72,16 @@ Vue.component('componente-productos', {
             }
         },
         listar(){
+            let storeCat = abrirStore('categorias', 'readonly'),
+                dataCat = storeCat.getAll();
+            dataCat.onsuccess = resp=>{
+                this.categorias = dataCat.result.map(categoria=>{
+                    return {
+                        id: categoria.idCategoria,
+                        label:categoria.nombre
+                    }
+                });
+            };
             let store = abrirStore('productos', 'readonly'),
                 data = store.getAll();
             data.onsuccess = resp=>{
@@ -70,9 +96,16 @@ Vue.component('componente-productos', {
     template: `
         <div class="row">
             <div class="col col-md-6">
-                <div class="card text-bg-dark">
-                    <div class="card-header">REGISTRO DE PRODUCTOS</div>
+                <div class="card">
+                    <div class="card-header text-bg-dark">REGISTRO DE PRODUCTOS</div>
                     <div class="catd-body">
+                        <div class="row p-1">
+                            <div class="col col-md-2">CATEGORIA</div>
+                            <div class="col col-md-3">
+                                <v-select-categoria required v-model="producto.categoria" 
+                                    :options="categorias">Por favor seleccione una categoria</v-select-categoria>
+                            </div>
+                        </div>
                         <div class="row p-1">
                             <div class="col col-md-2">CODIGO</div>
                             <div class="col col-md-3">
@@ -104,6 +137,18 @@ Vue.component('componente-productos', {
                             </div>
                         </div>
                         <div class="row p-1">
+                            <div class="col col-md-2">
+                                <img :src="producto.foto" width="50"/>
+                            </div>
+                            <div class="col col-md-4">
+                                <div class="mb-3">
+                                    <label for="formFile" class="form-label">Seleccione la foto</label>
+                                    <input class="form-control" type="file" id="formFile" 
+                                        accept="image/*" onChange="seleccionarFoto(this)">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row p-1">
                             <div class="col">
                                 <button @click.prevent.default="guardarProducto" class="btn btn-success">GUARDAR</button>
                                 <button @click.prevent.default="nuevoProducto" class="btn btn-warning">NUEVO</button>
@@ -121,11 +166,12 @@ Vue.component('componente-productos', {
                                 <thead>
                                     <tr>
                                         <th>BUSCAR</th>
-                                        <th colspan="5">
+                                        <th colspan="6">
                                             <input placeholder="codigo, nombre, marca, presentacion" type="search" v-model="valor" @keyup="buscarProducto" class="form-control">
                                         </th>
                                     </tr>
                                     <tr>
+                                        <th>CATEGORIA</th>
                                         <th>CODIGO</th>
                                         <th>NOMBRE</th>
                                         <th>MARCA</th>
@@ -136,6 +182,7 @@ Vue.component('componente-productos', {
                                 </thead>
                                 <tbody>
                                     <tr @click="modificarProducto(producto)" v-for="producto in productos" :key="producto.idProducto">
+                                        <td>{{producto.categoria.label}}</td>
                                         <td>{{producto.codigo}}</td>
                                         <td>{{producto.nombre}}</td>
                                         <td>{{producto.marca}}</td>
