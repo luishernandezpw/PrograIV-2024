@@ -53,7 +53,12 @@ Vue.component('componente-productos', {
                 this.listar();
             };
             query.onerror = e=>{
-                console.error('Error al guardar en productos', e.message());
+                console.error('Error al guardar en productos', e);
+                if( e.target.error.message.includes('uniqueness') ){
+                    alertify.error(`Error al guardar en productos, codigo ${this.producto.codigo} ya existe`);
+                    return;
+                }
+                alertify.error(`Error al guardar en productos, ${e.target.error.message}`);
             };
         },
         nuevoProducto(){
@@ -95,69 +100,71 @@ Vue.component('componente-productos', {
     },
     template: `
         <div class="row">
-            <div class="col col-md-6">
+            <div class="col col-md-5">
                 <div class="card">
                     <div class="card-header text-bg-dark">REGISTRO DE PRODUCTOS</div>
                     <div class="catd-body">
-                        <div class="row p-1">
-                            <div class="col col-md-2">CATEGORIA</div>
-                            <div class="col col-md-3">
-                                <v-select-categoria required v-model="producto.categoria" 
-                                    :options="categorias">Por favor seleccione una categoria</v-select-categoria>
-                            </div>
-                        </div>
-                        <div class="row p-1">
-                            <div class="col col-md-2">CODIGO</div>
-                            <div class="col col-md-3">
-                                <input v-model="producto.codigo" type="text" class="form-control">
-                            </div>
-                        </div>
-                        <div class="row p-1">
-                            <div class="col col-md-2">NOMBRE</div>
-                            <div class="col col-md-5">
-                                <input v-model="producto.nombre" type="text" class="form-control">
-                            </div>
-                        </div>
-                        <div class="row p-1">
-                            <div class="col col-md-2">MARCA</div>
-                            <div class="col col-md-5">
-                                <input v-model="producto.marca" type="text" class="form-control">
-                            </div>
-                        </div>
-                        <div class="row p-1">
-                            <div class="col col-md-2">PRESENTACION</div>
-                            <div class="col col-md-3">
-                                <input v-model="producto.presentacion" type="text" class="form-control">
-                            </div>
-                        </div>
-                        <div class="row p-1">
-                            <div class="col col-md-2">PRECIO</div>
-                            <div class="col col-md-3">
-                                <input v-model="producto.precio" type="number" class="form-control">
-                            </div>
-                        </div>
-                        <div class="row p-1">
-                            <div class="col col-md-2">
-                                <img :src="producto.foto" width="50"/>
-                            </div>
-                            <div class="col col-md-4">
-                                <div class="mb-3">
-                                    <label for="formFile" class="form-label">Seleccione la foto</label>
-                                    <input class="form-control" type="file" id="formFile" 
-                                        accept="image/*" onChange="seleccionarFoto(this)">
+                        <form id="frmProducto" @reset.prevent.default="nuevoProduto" @submit.prevent.default="guardarProducto">
+                            <div class="row p-1">
+                                <div class="col col-md-2">CATEGORIA</div>
+                                <div class="col col-md-8">
+                                    <v-select-categoria required v-model="producto.categoria" 
+                                        :options="categorias">Por favor seleccione una categoria</v-select-categoria>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row p-1">
-                            <div class="col">
-                                <button @click.prevent.default="guardarProducto" class="btn btn-success">GUARDAR</button>
-                                <button @click.prevent.default="nuevoProducto" class="btn btn-warning">NUEVO</button>
+                            <div class="row p-1">
+                                <div class="col col-md-2">CODIGO</div>
+                                <div class="col col-md-5">
+                                    <input v-model="producto.codigo" required pattern="[0-9]{2,25}" type="text" class="form-control">
+                                </div>
                             </div>
-                        </div>
+                            <div class="row p-1">
+                                <div class="col col-md-2">NOMBRE</div>
+                                <div class="col col-md-10">
+                                    <input v-model="producto.nombre" required pattern="^[a-zA-ZáíéóúñÑ]{3,50}([a-zA-ZáíéóúñÑ ]{1,50})$" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row p-1">
+                                <div class="col col-md-2">MARCA</div>
+                                <div class="col col-md-8">
+                                    <input v-model="producto.marca" required pattern="^[a-zA-ZáíéóúñÑ]{3,50}([a-zA-ZáíéóúñÑ ]{1,50})$" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row p-1">
+                                <div class="col col-md-2">PRESENTACION</div>
+                                <div class="col col-md-10">
+                                    <input v-model="producto.presentacion" required pattern="^[a-zA-Z0-9áíéóúñÑ]{1,50}([a-zA-Z0-9áíéóúñÑ. ]{2,50})$" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row p-1">
+                                <div class="col col-md-2">PRECIO</div>
+                                <div class="col col-md-3">
+                                    <input v-model="producto.precio" required type="number" step="0.01" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row p-1">
+                                <div class="col col-md-2">
+                                    <img :src="producto.foto" width="50"/>
+                                </div>
+                                <div class="col col-md-8">
+                                    <div class="mb-3">
+                                        <label for="formFile" class="form-label">Seleccione la foto</label>
+                                        <input class="form-control" type="file" id="formFile" required 
+                                            accept="image/*" onChange="seleccionarFoto(this)">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row p-1">
+                                <div class="col">
+                                    <input type="submit" class="btn btn-success" value="GUARDAR"/>
+                                    <input type="reset" class="btn btn-warning" value="NUEVO" />
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
-            <div class="col col-md-6">
+            <div class="col col-md-7">
                 <div class="card text-bg-dark">
                     <div class="card-header">LISTADO DE PRODUCTOS</div>
                     <div class="card-body">
@@ -166,7 +173,7 @@ Vue.component('componente-productos', {
                                 <thead>
                                     <tr>
                                         <th>BUSCAR</th>
-                                        <th colspan="6">
+                                        <th colspan="7">
                                             <input placeholder="codigo, nombre, marca, presentacion" type="search" v-model="valor" @keyup="buscarProducto" class="form-control">
                                         </th>
                                     </tr>
@@ -178,6 +185,7 @@ Vue.component('componente-productos', {
                                         <th>PRESENTACION</th>
                                         <th>PRECIO</th>
                                         <th></th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -188,6 +196,7 @@ Vue.component('componente-productos', {
                                         <td>{{producto.marca}}</td>
                                         <td>{{producto.presentacion}}</td>
                                         <td>{{producto.precio}}</td>
+                                        <td><img :src="producto.foto" width="50"/></td>
                                         <td><button @click.prevent.default="eliminarProducto(producto.idProducto)" class="btn btn-danger">del</button></td>
                                     </tr>
                                 </tbody>
