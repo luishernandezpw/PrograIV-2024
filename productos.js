@@ -43,7 +43,7 @@ Vue.component('componente-productos', {
                 console.error("Por favor seleccione una categoria");
                 return;
             }
-            await db.productos.bulkPut([{...this.productos}]);
+            await db.productos.bulkPut([{...this.producto}]);
             this.nuevoProducto();
             this.listar();
             

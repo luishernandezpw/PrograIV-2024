@@ -29,6 +29,10 @@ Vue.component('componente-categorias', {
         async guardarCategoria(){
             //almacenamiento del objeto categorias en indexedDB
             await db.categorias.bulkPut([{...this.categoria}]);
+            let respuesta = await fetch(`private/modulos/categorias/categorias.php?accion=${this.accion}&categorias=${JSON.stringify(this.categoria)}`),
+                data = await respuesta.json();
+            console.log(data);
+            
             this.nuevoCategoria();
             this.listar();
         },
