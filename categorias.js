@@ -17,7 +17,10 @@ Vue.component('componente-categorias', {
         },
         async eliminarCategoria(idCategoria){
             if( confirm(`Esta seguro de elimina el categoria?`) ){
+                this.accion='eliminar';
                 await db.categorias.where("idCategoria").equals(idCategoria).delete();
+                let respuesta = await fetch(`private/modulos/categorias/categorias.php?accion=eliminar&categorias=${JSON.stringify(this.categoria)}`),
+                    data = await respuesta.json();
                 this.nuevoCategoria();
                 this.listar();
             }
@@ -31,8 +34,6 @@ Vue.component('componente-categorias', {
             await db.categorias.bulkPut([{...this.categoria}]);
             let respuesta = await fetch(`private/modulos/categorias/categorias.php?accion=${this.accion}&categorias=${JSON.stringify(this.categoria)}`),
                 data = await respuesta.json();
-            console.log(data);
-            
             this.nuevoCategoria();
             this.listar();
         },
@@ -49,6 +50,11 @@ Vue.component('componente-categorias', {
             .filter(categoria=>categoria.codigo.includes(this.valor) ||
                 categoria.nombre.toLowerCase().includes(this.valor.toLowerCase()));
             this.categorias = await collections.toArray();
+            if( this.categorias.length<=0 ){
+                let respuesta = await fetch('private/modulos/categorias/categorias.php?accion=consultar'),
+                    data = await respuesta.json();
+                this.categorias = data;
+            }
         }
     },
     template: `

@@ -3,6 +3,9 @@ include('../../Config/Config.php');
 extract($_REQUEST);
 
 $categorias = isset($categorias) ? $categorias : '[]';
+$accion=$accion ?? '';
+$class_categorias = new categorias($conexion);
+print_r( json_encode($class_categorias->recibir_datos($categorias)) );
 
 class categorias{
     private $datos=[], $db, $respuesta = ['msg'=>'ok'];
@@ -10,8 +13,13 @@ class categorias{
         $this->db = $db;
     }
     public function recibir_datos($categorias){
-        $this->datos = json_decode($categorias);
-        return $this->validar_datos();
+        global $accion;
+        if($accion==='consultar'){
+            return $this->administrar_categorias();
+        }else{
+            $this->datos = json_decode($categorias, true);
+            return $this->validar_datos();
+        }
     }
     private function validar_datos(){
         if( empty($this->datos['idCategoria']) ){
@@ -27,11 +35,19 @@ class categorias{
     }
     private function administrar_categorias(){
         global $accion;
-
         if( $this->respuesta['msg'] === 'ok' ){
             if( $accion==='nuevo' ){
                 return $this->db->consultas('INSERT INTO categorias VALUES(?,?,?)',
                 $this->datos['idCategoria'],$this->datos['codigo'],$this->datos['nombre']);
+            }else if($accion==='modificar' ){
+                return $this->db->consultas('UPDATE categorias SET codigo=?, nombre=? WHERE idCategoria=?',
+                $this->datos['codigo'],$this->datos['nombre'], $this->datos['idCategoria']);
+            }else if($accion==='eliminar'){
+                return $this->db->consultas('DELETE categorias FROM categorias WHERE idCategoria=?',
+                $this->datos['idCategoria']);
+            }else if($accion==='consultar'){
+                $this->db->consultas('SELECT * FROM categorias');
+                return $this->db->obtener_datos();
             }
         }else{
             return $this->respuesta;
