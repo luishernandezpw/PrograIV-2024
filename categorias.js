@@ -54,6 +54,7 @@ Vue.component('componente-categorias', {
                 let respuesta = await fetch('private/modulos/categorias/categorias.php?accion=consultar'),
                     data = await respuesta.json();
                 this.categorias = data;
+                db.categorias.bulkPut(data);
             }
         }
     },

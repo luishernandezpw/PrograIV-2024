@@ -28,6 +28,9 @@ Vue.component('componente-productos', {
         async eliminarProducto(idProducto){
             if( confirm(`Esta seguro de elimina el producto?`) ){
                 await db.productos.where("idProducto").equals(idProducto).delete();
+                this.producto.foto = '';
+                let respuesta = await fetch(`private/modulos/productos/productos.php?accion=eliminar&productos=${JSON.stringify(this.producto)}`),
+                    data = await respuesta.json();
                 this.nuevoProducto();
                 this.listar();
             }
@@ -44,6 +47,8 @@ Vue.component('componente-productos', {
                 return;
             }
             await db.productos.bulkPut([{...this.producto}]);
+            let respuesta = await fetch(`private/modulos/productos/productos.php?accion=${this.accion}&productos=${JSON.stringify(this.producto)}`),
+                data = await respuesta.json();
             this.nuevoProducto();
             this.listar();
             
@@ -79,7 +84,7 @@ Vue.component('componente-productos', {
                     id: categoria.idCategoria,
                     label:categoria.nombre
                 }
-            })
+            });
             let collection = db.productos.orderBy('codigo').filter(
                 producto=>producto.codigo.includes(this.valor) || 
                     producto.nombre.toLowerCase().includes(this.valor.toLowerCase()) || 
@@ -87,6 +92,26 @@ Vue.component('componente-productos', {
                     producto.presentacion.toLowerCase().includes(this.valor.toLowerCase())
             );
             this.productos = await collection.toArray();
+            if( this.productos.length<=0 ){
+                let respuesta = await fetch('private/modulos/productos/productos.php?accion=consultar'),
+                    data = await respuesta.json();
+                this.productos = data.map(producto=>{
+                    return {
+                        categoria:{
+                            id:producto.idCategoria,
+                            label:producto.nomcat
+                        }, 
+                        idProducto : producto.idProducto,
+                        codigo: producto.codigo,
+                        nombre: producto.nombre,
+                        marca: producto.marca,
+                        presentacion: producto.presentacion,
+                        precio: producto.precio,
+                        foto:producto.foto.split(' ').join('+')
+                    }
+                });
+                db.productos.bulkPut(this.productos);
+            }
         }
     },
     template: `
