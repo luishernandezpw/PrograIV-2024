@@ -30,10 +30,13 @@
                 </div>
             </nav>
             <div id="appSistema">
-                <componente-categorias ref="categoria" v-show="forms['categoria'].mostrar"></componente-categorias>
-                <componente-productos ref="producto" v-show="forms['producto'].mostrar"></componente-productos>
+                <categorias ref="categoria" v-show="forms['categoria'].mostrar"></categorias>
+                <!--<componente-productos ref="producto" v-show="forms['producto'].mostrar"></componente-productos>
                 <componente-clientes ref="cliente" v-show="forms['cliente'].mostrar"></componente-clientes>
+                -->
             </div>
         </div>
+
+        @vite('resources/js/app.js')
     </body>
 </html>

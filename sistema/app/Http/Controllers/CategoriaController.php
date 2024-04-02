@@ -27,11 +27,12 @@ class CategoriaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request)//POST
     {
-        //
+        //insert into categorias
+        Categoria::create($request->all());
+        return response()->json(['msg'=>'ok'], 200);
     }
-
     /**
      * Display the specified resource.
      */
@@ -39,7 +40,6 @@ class CategoriaController extends Controller
     {
         //
     }
-
     /**
      * Show the form for editing the specified resource.
      */
@@ -53,14 +53,21 @@ class CategoriaController extends Controller
      */
     public function update(Request $request, Categoria $categoria)
     {
-        //
+        //update categorias
+        $categoria::where('idCategoria', $request['idCategoria'])->update([
+            'codigo'=>$request['codigo'],
+            'nombre'=>$request['nombre']
+        ]);
+        return response()->json(['msg'=>'ok'], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Categoria $categoria)
+    public function destroy(Request $request, Categoria $categoria)
     {
-        //
+        //delete from categorias
+        $categoria::where('idCategoria', $request['idCategoria'])->delete();
+        return response()->json(['msg'=>'ok'], 200);
     }
 }

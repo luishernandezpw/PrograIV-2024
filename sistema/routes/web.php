@@ -15,6 +15,9 @@ use App\Http\Controllers\ProductoController;
 */
 Route::controller(CategoriaController::class)->group(function(){
     Route::get('/categorias', 'index');
+    Route::post('/categorias', 'store');
+    Route::put('/categorias', 'update');
+    Route::delete('/categorias', 'destroy');
 });
 Route::controller(ProductoController::class)->group(function(){
     Route::get('/productos', 'index');
