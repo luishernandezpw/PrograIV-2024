@@ -4,6 +4,12 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Sistema de Facturacion</title>
+        <!-- Alertify -->
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css"/>
+        <!-- Default theme -->
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css"/>
+        <!-- Semantic UI theme -->
+        <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/semantic.min.css"/>
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
@@ -31,12 +37,11 @@
             </nav>
             <div id="appSistema">
                 <categorias ref="categoria" v-show="forms['categoria'].mostrar"></categorias>
-                <!--<componente-productos ref="producto" v-show="forms['producto'].mostrar"></componente-productos>
-                <componente-clientes ref="cliente" v-show="forms['cliente'].mostrar"></componente-clientes>
+                <productos ref="producto" v-show="forms['producto'].mostrar"></productos>
+                <!--<componente-clientes ref="cliente" v-show="forms['cliente'].mostrar"></componente-clientes>
                 -->
             </div>
         </div>
-
         @vite('resources/js/app.js')
     </body>
 </html>

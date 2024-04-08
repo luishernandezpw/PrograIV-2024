@@ -21,6 +21,9 @@ Route::controller(CategoriaController::class)->group(function(){
 });
 Route::controller(ProductoController::class)->group(function(){
     Route::get('/productos', 'index');
+    Route::post('/productos', 'store');
+    Route::put('/productos', 'update');
+    Route::delete('/productos', 'destroy');
 });
 Route::get('/', function () {
     return view('welcome');

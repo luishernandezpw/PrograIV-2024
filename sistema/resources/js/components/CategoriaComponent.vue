@@ -59,6 +59,8 @@
         </div>
 </template>
 <script>
+    import axios from 'axios';
+    import alertify from 'alertifyjs';
     export default {
         data() {
             return {
@@ -80,8 +82,19 @@
                 if( confirm(`Esta seguro de elimina el categoria?`) ){
                     this.accion='eliminar';
                     await db.categorias.where("idCategoria").equals(idCategoria).delete();
-                    let respuesta = await fetch(`private/modulos/categorias/categorias.php?accion=eliminar&categorias=${JSON.stringify(this.categoria)}`),
-                        data = await respuesta.json();
+                    axios({
+                        url: 'categorias',
+                        method: 'DELETE',
+                        data: {idCategoria}
+                    }).then(resp=>{
+                        if( resp.data.msg==='ok' ){
+                            alertify.success('Categoria eliminado con exito');
+                        }else{
+                            alertify.error(`Error: ${resp.data.msg}`);
+                        }
+                    }).catch(err=>{
+                        alertify.error(`Error: ${err}`);
+                    })
                     this.nuevoCategoria();
                     this.listar();
                 }
@@ -93,20 +106,23 @@
             async guardarCategoria(){
                 //almacenamiento del objeto categorias en indexedDB
                 await db.categorias.bulkPut([{...this.categoria}]);
-                let respuesta = await fetch('categorias',{
-                        method: "POST", // *GET, POST, PUT, DELETE, etc.
-                        mode: "cors", // no-cors, *cors, same-origin
-                        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
-                        credentials: "include", // include, *same-origin, omit
-                        headers: {
-                        "Content-Type": "application/json",
-                        // 'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        redirect: "follow", // manual, *follow, error
-                        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-                        body: JSON.stringify(this.categoria), // body data type must match "Content-Type" header
-                    }),
-                    data = await respuesta.json();
+                let method = 'POST';
+                if( this.accion === 'modificar' ){
+                    method = 'PUT';
+                }
+                axios({
+                    url: 'categorias',
+                    method,
+                    data: this.categoria
+                }).then(resp=>{
+                    if( resp.data.msg==='ok' ){
+                        alertify.success('Categoria guardado con exito');
+                    }else{
+                        alertify.error(`Error: ${resp.data.msg}`);
+                    }
+                }).catch(err=>{
+                    alertify.error(`Error: ${err}`);
+                });
                 this.nuevoCategoria();
                 this.listar();
             },

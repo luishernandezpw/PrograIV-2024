@@ -2,11 +2,13 @@ import './bootstrap';
 import { createApp } from 'vue';
 import Dexie from 'dexie';
 import categorias from './components/CategoriaComponent.vue';
+import productos from './components/ProductoComponent.vue';
 window.db = '';
 
 const app = createApp({
     components:{
         categorias,
+        productos,
     },
     data(){
         return{

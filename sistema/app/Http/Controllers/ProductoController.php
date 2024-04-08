@@ -12,8 +12,8 @@ class ProductoController extends Controller
      */
     public function index()
     {
-        //select * from productos
-        return producto::get();
+        //select * from productos inner join categorias
+        return Producto::with('categorias')->get();
     }
 
     /**
@@ -29,7 +29,9 @@ class ProductoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //insert into productos
+        Producto::create($request->all());
+        return response()->json(['msg'=>'ok'], 200);
     }
 
     /**
@@ -53,7 +55,17 @@ class ProductoController extends Controller
      */
     public function update(Request $request, Producto $producto)
     {
-        //
+        //update productos
+        $producto::where('idProducto', $request['idProducto'])->update([
+            'idCategoria'=>$request['idCategoria'],
+            'codigo'=>$request['codigo'],
+            'nombre'=>$request['nombre'],
+            'marca'=>$request['marca'],
+            'presentacion'=>$request['presentacion'],
+            'precio'=>$request['precio'],
+            'foto'=>$request['foto']
+        ]);
+        return response()->json(['msg'=>'ok'], 200);
     }
 
     /**
@@ -61,6 +73,8 @@ class ProductoController extends Controller
      */
     public function destroy(Producto $producto)
     {
-        //
+        //delete from productos
+        $producto::where('idProducto', $request['idProducto'])->delete();
+        return response()->json(['msg'=>'ok'], 200);
     }
 }
