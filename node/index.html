@@ -53,5 +53,27 @@
             </div>
         </div>
     </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', e=>{
+            frmUsuarios.addEventListener('submit', e=>{
+                e.preventDefault();
+                let usuario = {
+                    usuario: txtUsuario.value,
+                    clave: txtClave.value,
+                    nombre: txtNombre.value
+                };
+                fetch('/usuarios/guardar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(usuario)
+                }).then(res=>res.json())
+                .then(data=>{
+                    console.log(data);
+                });
+            });
+        });
+    </script>
 </body>
 </html>

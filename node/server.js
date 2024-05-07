@@ -1,7 +1,7 @@
 const express = require('express'),
     app = express(),
     http = require('http').Server(app),
-    io = require('socked.io')(http,{
+    io = require('socket.io')(http,{
         allowEIO3:true,
         cors:{
             origin:['http://localhost'],
@@ -9,7 +9,7 @@ const express = require('express'),
         }
     }),
     { MongoClient } = require('mongodb'),
-    url = 'mongodb://localhost:27017',
+    url = 'mongodb://127.0.0.1:27017',
     client = new MongoClient(url),
     dbname = 'chatUGB',
     port = 3001;
