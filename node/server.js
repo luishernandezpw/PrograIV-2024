@@ -25,7 +25,12 @@ app.get('/', (req, resp)=>{
 app.get('/usuarios/listar',async(req, resp)=>{
     let db = await conectarMongoDb(),
         collection=db.collection('usuarios');
-    let result = await collection.find({}).toArray();
+    let result = await collection.find({
+        $or: [
+            {nombre: new RegExp(req.query.valor, 'i')},
+            {usuario: new RegExp(req.query.valor, 'i')}
+        ]
+    }).toArray();
     resp.send(result);
 });
 app.post('/usuarios/guardar',async(req, resp)=>{
@@ -35,8 +40,9 @@ app.post('/usuarios/guardar',async(req, resp)=>{
     if( req.body.accion == 'nuevo' ){
         result = await collection.insertOne(req.body.usuario);
     }else if( req.body.accion == 'modificar' ){
-        let idUsuario = new ObjectId(req.body.idUsuario);
-        result = await collection.updateOne({ _id: idUsuario }, { $set: req.body.usuario });
+        result = await collection.updateOne({ _id: new ObjectId(req.body.idUsuario) }, { $set: req.body.usuario });
+    }else if( req.body.accion == 'eliminar' ){
+        result = await collection.deleteOne({ _id: new ObjectId(req.body.idUsuario) });
     }
     resp.send(result);
 });

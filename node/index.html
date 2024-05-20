@@ -27,7 +27,7 @@
                     <div class="row p-1">
                         <div class="col-6 col-md-6">
                             <input id="txtUsuario" type="text" class="form-control" 
-                                id="txtUsuario" required placeholder="Usuario">
+                                id="txtUsuario" pattern="^[a-zA-Z0-9]{6,20}$" required placeholder="Usuario">
                         </div>
                     </div>
                     <div class="row p-1">
@@ -35,7 +35,7 @@
                     </div>
                     <div class="row p-1">
                         <div class="col-6 col-md-6">
-                            <input id="txtClave" type="password" class="form-control" 
+                            <input id="txtClave" pattern="^[a-zA-Z0-9]{6,20}$" type="password" class="form-control" 
                                 id="txtClave" required placeholder="Clave">
                         </div>
                     </div>
@@ -45,7 +45,7 @@
                     <div class="row p-1">
                         <div class="col-6 col-md-6">
                             <input id="txtNombre" type="text" class="form-control" 
-                                id="txtNombre" required placeholder="Nombre">
+                                id="txtNombre" pattern="^[a-zA-ZñÑ]{3,50}([a-zA-ZñÑ ]{1,75})$" required placeholder="Nombre">
                         </div>
                     </div>
                     <div class="row p-1">
@@ -59,6 +59,12 @@
                     <div class="row">
                         <div class="col-12">
                             LISTADO DE USUARIOS
+                        </div>
+                    </div>
+                    <div class="row p-1">
+                        <div class="col-12 col-md-12">
+                            <input id="txtBusqueda" type="text" class="form-control" 
+                                id="txtBusqueda" placeholder="Buscar...">
                         </div>
                     </div>
                     <div class="row">
@@ -89,6 +95,13 @@
                 e.preventDefault();
                 guardarUsuario();
             });
+            frmUsuarios.addEventListener('reset', e=>{
+                nuevoUsuario();
+            });
+        });
+        txtBusqueda.addEventListener('keyup', e=>{
+            let valor = txtBusqueda.value;
+            listarUsuarios(valor); 
         });
         function nuevoUsuario(){
             accion = 'nuevo';
@@ -106,6 +119,15 @@
             txtNombre.value = usuario.nombre;
             txtUsuario.focus();
         }
+        function eliminarUsuario(obj, usuario){
+            if( confirm(`¿Desea eliminar el usuario ${usuario.usuario}?`) ){
+                let datos = {
+                    accion: 'eliminar',
+                    idUsuario: usuario._id
+                };
+                peticionServidor('/usuarios/guardar', datos);
+            }
+        }
         function guardarUsuario(){
             let datos = {
                 accion,
@@ -116,7 +138,30 @@
                     nombre: txtNombre.value
                 }
             };
-            fetch('/usuarios/guardar', {
+            let validar = new RegExp('^[a-zA-Z0-9]{6,20}$');
+            if( !validar.test(txtUsuario.value) ){
+                alertify.error('El usuario debe ser entre 6 a 20 caracteres');
+                return;
+            }
+            peticionServidor('/usuarios/guardar', datos);
+        }
+        function listarUsuarios(valor = ''){
+            fetch(`/usuarios/listar?valor=${valor}`)
+            .then(res=>res.json())
+            .then(data=>{
+                let filas = '';
+                data.forEach( usuario => {
+                    filas += `<tr>
+                        <td onclick='modificarUsuario(${JSON.stringify(usuario)})'>${usuario.usuario}</td>
+                        <td onclick='modificarUsuario(${JSON.stringify(usuario)})'>${usuario.nombre}</td>
+                        <td><button class="btn btn-danger" onclick='eliminarUsuario(this, ${JSON.stringify(usuario)})'>del</button></td>
+                    </tr>`;
+                });
+                tblUsuarios.innerHTML = filas;
+            });
+        }
+        function peticionServidor(url, datos){
+            fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -125,26 +170,12 @@
             }).then(res=>res.json())
             .then(data=>{
                 if( data.acknowledged ){
-                    alertify.success('Usuario guardado');
+                    alertify.success('Usuario procesado correctamente');
                     nuevoUsuario();
                     listarUsuarios();
                 }else{
-                    alertify.error('Error al guardar el usuario');
+                    alertify.error('Error al procesar el usuario');
                 }
-            });
-        }
-        function listarUsuarios(){
-            fetch('/usuarios/listar')
-            .then(res=>res.json())
-            .then(data=>{
-                let filas = '';
-                data.forEach( usuario => {
-                    filas += `<tr onclick='modificarUsuario(${JSON.stringify(usuario)})'>
-                        <td>${usuario.usuario}</td>
-                        <td>${usuario.nombre}</td>
-                    </tr>`;
-                });
-                tblUsuarios.innerHTML = filas;
             });
         }
     </script>
