@@ -1,3 +1,7 @@
+window.socketio = io('http://127.0.0.1:3001');
+socketio.on('connect', ()=>{
+    console.log('conectado...');
+})
 var app = new Vue({
     el: '#app',
     data:{
@@ -5,6 +9,7 @@ var app = new Vue({
             producto:{mostrar:false},
             categoria:{mostrar:false},
             cliente:{mostrar:false},
+            chat:{mostrar:false},
         }
     },
     methods:{

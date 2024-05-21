@@ -21,6 +21,7 @@
                         <a class="nav-link" @click="abrirFormulario('categoria')">Categoria</a>
                         <a class="nav-link" @click="abrirFormulario('producto')">Productos</a>
                         <a class="nav-link" @click="abrirFormulario('cliente')">Cliente</a>
+                        <a class="nav-link" @click="abrirFormulario('chat')">Chat</a>
                     </div>
                 </div>
             </div>
@@ -29,8 +30,10 @@
             <componente-categorias ref="categoria" v-show="forms['categoria'].mostrar"></componente-categorias>
             <componente-productos ref="producto" v-show="forms['producto'].mostrar"></componente-productos>
             <componente-clientes ref="cliente" v-show="forms['cliente'].mostrar"></componente-clientes>
+            <componente-chat ref="chat" v-show="forms['chat'].mostrar"></componente-chat>
         </div>
     </div>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/AlertifyJS/1.13.1/alertify.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.7.16/dist/vue.js"></script>
@@ -40,6 +43,7 @@
     <script src="categorias.js"></script>
     <script src="productos.js"></script>
     <script src="clientes.js"></script>
+    <script src="chat.js"></script>
     <script src="main.js"></script>
 </body>
 </html>

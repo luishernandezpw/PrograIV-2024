@@ -4,7 +4,7 @@ const express = require('express'),
     io = require('socket.io')(http,{
         allowEIO3:true,
         cors:{
-            origin:['http://localhost'],
+            origin:['http://localhost', 'http://127.0.0.1'],
             credential:true
         }
     }),
@@ -15,6 +15,21 @@ const express = require('express'),
     port = 3001;
 app.use(express.json());
 
+io.on('connect', socket=>{
+    console.log('conectado...');
+    socket.on('chat', async chat=>{
+        let db = await conectarMongoDb(),
+            collection=db.collection('chats');
+        collection.insertOne(chat);
+        socket.broadcast.emit('chat', chat);//notificar a todos menos a si mismo
+    });
+    socket.on('historial', async()=>{
+        let db = await conectarMongoDb(),
+            collection=db.collection('chats');
+        let result = await collection.find().toArray();
+        socket.emit('historial', result);//notificar a si mismo
+    });
+});
 async function conectarMongoDb(){
     await client.connect();
     return client.db(dbname);
