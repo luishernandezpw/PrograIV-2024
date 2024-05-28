@@ -33,6 +33,7 @@ Vue.component('componente-chat', {
         this.obtenerHistorial();
         socketio.on('chat', (data)=>{
             this.chats.push(data);
+            mostrarNotificaciones('Nuevo mensaje recibido...', data.message);
         });
     },
     template: `
